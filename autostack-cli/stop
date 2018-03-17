@@ -1,0 +1,55 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+fi
+echo "关闭$*"
+STOP_PG=false
+STOP_REDIS=false
+STOP_TOMCAT=false
+CP_REDIS="redis"
+CP_PG="pg"
+CP_TOMCAT="tomcat"
+CP_ALL="all"
+for i in "$@"; do
+    if [[ "$i" = "$CP_REDIS" || "$i" = "$CP_ALL" ]];
+    then
+        STOP_REDIS=true
+    fi
+
+    if [[ "$i" = "$CP_PG" || "$i" = "$CP_ALL" ]];
+    then
+        STOP_PG=true
+    fi
+
+    if [[ "$i" = "$CP_TOMCAT" || "$i" = "$CP_ALL" ]];
+    then
+        STOP_TOMCAT=true
+    fi
+done
+
+if [ "$STOP_TOMCAT" = true ];
+then
+    echo "##############################################################"
+    echo "########################   关闭TOMCAT  ########################"
+    echo "###############################################################"
+    # $CATALINA_HOME/bin/shutdown.sh
+    ps -ef | grep 'tomcat' | grep -v grep| awk '{print $2}' | xargs kill -9
+fi
+
+if [ "$STOP_REDIS" = true ];
+then
+    echo "################################################################"
+    echo "######################## 关闭Redis-server #######################"
+    echo "################################################################"
+    $REDIS_HOME/src/redis-cli -a $REDIS_PWD shutdown
+fi
+
+if [ "$STOP_PG" = true ];
+then
+    echo "#################################################################"
+    echo "#########################   关闭PG-Server  #######################"
+    echo "##################################################################"
+    su - postgres -s /bin/bash $BASE_DIR/stop-pg $BASE_DIR
+fi
+

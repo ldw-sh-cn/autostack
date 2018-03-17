@@ -1,0 +1,29 @@
+#!/bin/sh
+####GLIBC package
+GLIBC_VERSION="2.12.1"
+# GLIBC_TAR_GZ="glibc-2.16.0.tar.gz"
+GLIBC_RPM="glibc-2.12-1.209.el6_9.2.x86_64.rpm"
+GLIBC_COMMON="glibc-common-2.12-1.209.el6_9.2.x86_64.rpm"
+TZDATA="tzdata-2018c-1.el6.noarch.rpm"
+####GLIBC-DEVEL package
+GLIBC_DEVEL="glibc-devel-2.12-1.209.el6_9.2.x86_64.rpm"
+KERNEL_HEADERS="kernel-headers-2.6.32-696.20.1.el6.x86_64.rpm"
+GLIB_HEADERS="glibc-headers-2.12-1.209.el6_9.2.x86_64.rpm"
+
+####GCC dependent lib
+LIBGCC="libgcc-4.4.7-18.el6.x86_64.rpm"
+LIBGOMP="libgomp-4.4.7-18.el6.x86_64.rpm"
+
+####GCC dependent package
+MPFR="mpfr-2.4.1-6.el6.x86_64.rpm"
+PPL="ppl-0.10.2-11.el6.x86_64.rpm"
+CLOOG_PPL="cloog-ppl-0.15.7-1.2.el6.x86_64.rpm"
+CPP="cpp-4.4.7-18.el6.x86_64.rpm"
+####GCC package
+GCC_RPM="gcc-4.4.7-18.el6.x86_64.rpm"
+
+####READLINE package
+READ_LINE="readline-6.0-4.el6.x86_64.rpm"
+NCURSES_DEVEL="ncurses-devel-5.7-4.20090207.el6.x86_64.rpm"
+READLINE_DEVEL="readline-devel-6.0-4.el6.x86_64.rpm"
+ZLIB_DEVEL="zlib-devel-1.2.3-29.el6.x86_64.rpm"

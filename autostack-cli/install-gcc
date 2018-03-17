@@ -1,0 +1,80 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+fi
+source $BASE_DIR/packages/os/$OS/$OS_VERSION/env
+source $BASE_DIR/install-glibc
+echo "########################################################################"
+echo "################################   安装GCC  ############################"
+echo "########################################################################"
+#   下载安装包 只下载不安装 rhel系统必须注册 才能下载
+#   yum install glibc --downloadonly --downloaddir=/tmp/software/glibc
+#   yum install glibc-devel --downloadonly --downloaddir=/tmp/software/glibc-devel
+#   yum install readline --downloadonly --downloaddir=/tmp/software
+#   yum install readline-devel --downloadonly --downloaddir=/tmp/software
+#   yum install zlib-devel --downloadonly --downloaddir=/tmp/software
+#   yum install expect --downloadonly --downloaddir=/tmp/software/expect
+#   yum install salt-master --downloadonly --downloaddir=/tmp/software/salt-master
+#   yum install salt-minion --downloadonly --downloaddir=/tmp/software/salt-minion
+#   rpm -Uvh http://ftp.linux.ncsu.edu/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+#pg requirements:
+#   make 3.8 make --version
+#   GCC
+#   zlib --without-zlib  pg_dump and pg_restore
+#   tar
+#error: Failed dependencies:
+#   glibc-devel >= 2.2.90-12 is needed by gcc-4.4.7-18.el6.x86_64
+# ####GCC dependent lib
+# LIBGCC="libgcc-4.4.7-18.el6.x86_64.rpm"
+# LIBGOMP="libgomp-4.4.7-18.el6.x86_64.rpm"
+
+# ####GCC dependent package
+# MPFR="mpfr-2.4.1-6.el6.x86_64.rpm"
+# PPL="ppl-0.10.2-11.el6.x86_64.rpm"
+# CLOOG_PPL="cloog-ppl-0.15.7-1.2.el6.x86_64.rpm"
+# CPP="cpp-4.4.7-18.el6.x86_64.rpm"
+# ####GCC package
+# GCC_RPM="gcc-4.4.7-18.el6.x86_64.rpm"
+gcc_lib_array=($LIBGCC $LIBGOMP)
+gcc_array=($MPFR $PPL $CLOOG_PPL $CPP $GCC_RPM)
+if [ "$GCC" = true ];
+then
+####GCC dependent package
+for i in ${gcc_lib_array[@]};
+do
+  rpm -Uvh $BASE_DIR/packages/os/$OS/$OS_VERSION/gcc/$i
+done
+
+for i in ${gcc_array[@]};
+do
+  rpm -ivh $BASE_DIR/packages/os/$OS/$OS_VERSION/gcc/$i
+done
+# PKG_MPFR="$BASE_DIR/packages/os/$OS/$OS_VERSION/gcc/$MPFR"
+# PKG_PPL="$BASE_DIR/packages/os/$OS/$OS_VERSION/gcc/$PPL"
+# PKG_COOG_PPL="$BASE_DIR/packages/os/$OS/$OS_VERSION/gcc/$CLOOG_PPL"
+# PKG_CPP="$BASE_DIR/packages/os/$OS/$OS_VERSION/gcc/$CPP"
+# ####GCC dependent lib
+# PKG_LIBGCC="$BASE_DIR/packages/os/$OS/$OS_VERSION/gcc/$LIBGCC"
+# PKG_LIBGOMP="$BASE_DIR/packages/os/$OS/$OS_VERSION/gcc/$LIBGOMP"
+# ####GCC package
+# PKG_GCC="$BASE_DIR/packages/os/$OS/$OS_VERSION/gcc/$GCC_RPM"
+# echo "升级LIB包#############"
+# rpm -Uvh $PKG_LIBGCC $PKG_LIBGOMP
+# echo "安装GCC#############"
+# rpm -ivh $PKG_MPFR $PKG_PPL $PKG_COOG_PPL $PKG_CPP $PKG_GCC
+echo "########################################################################"
+echo "##############################   GCC安装完成   ##########################"
+echo "########################################################################"
+else
+    echo "SKIP Install GCC"
+fi
+
+
+
+
+
+
+
+
+

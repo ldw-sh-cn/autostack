@@ -1,0 +1,19 @@
+#!/bin/sh
+source ./env
+source $BASE_DIR/install-jdk
+source $BASE_DIR/install-tomcat
+source $BASE_DIR/install-gcc
+source $BASE_DIR/install-readline
+source $BASE_DIR/install-redis
+source $BASE_DIR/install-pg
+source $BASE_DIR/dbsetup init
+source $BASE_DIR/deploy
+
+
+
+
+
+
+
+
+

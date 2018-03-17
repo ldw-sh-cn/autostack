@@ -1,0 +1,46 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+fi
+echo "########################################################################"
+echo "##############################      安装JDK   ##########################"
+echo "########################################################################"
+
+if [ "$JDK" = true ];
+then
+    if [ ! -e $JAVA_HOME ];
+    then
+        PKG_JDK="$BASE_DIR/packages/jdk/$JDK_TAR_GZ"
+        echo "检测JDK安装包"
+        if [ -e $PKG_JDK ];
+        then
+            echo "开始安装JDK"
+            \cp -f /etc/profile $BASE_DIR
+            if [ ! -e $JAVA_BASE_DIR ];
+            then
+                mkdir $JAVA_BASE_DIR
+            fi
+            tar -zxvf $PKG_JDK -C $JAVA_BASE_DIR || exit 1
+            echo "######################" >> /etc/profile
+            echo "######################" >> /etc/profile
+            echo "export JAVA_HOME=$JAVA_HOME" >> /etc/profile
+            echo 'export JRE_HOME=$JAVA_HOME/jre' >> /etc/profile
+            echo 'export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH' >> /etc/profile
+            echo 'export CLASSPATH=.:$CLASSPATH:$JAVA_HOME/lib:$JRE_HOME/lib' >> /etc/profile
+            echo "JAVA_HOME=$JAVA_HOME"
+            source /etc/profile
+            java -version
+            echo "########################################################################"
+            echo "##############################      安装JDK    ##########################"
+            echo "########################################################################"
+        else
+            echo "JDK安装包$PKG_JDK不存在，安装失败"
+        fi
+    else
+        echo "$JAVA_HOME已存在, 请先删除再安装！"
+    fi
+    
+else
+    echo "SKIP Install JDK!"
+fi

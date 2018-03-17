@@ -1,0 +1,89 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+fi
+source /etc/profile
+source $BASE_DIR/stop tomcat
+echo "########################################################################"
+echo "###############################   部署war包   ###########################"
+echo "########################################################################"
+
+WAR_BASE_DIR="$BASE_DIR/packages/war/deploy"
+WEB_APPS_DIR="$CATALINA_HOME/webapps"
+if [ -e $WAR_BASE_DIR ];
+then
+    cd $WAR_BASE_DIR
+    for dir in $(ls $WAR_BASE_DIR);
+    do
+        echo "#################################部署$dir##################################"
+        if [ -d $WAR_BASE_DIR/$dir ];
+        then
+            cd $WAR_BASE_DIR/$dir
+            war_file=$(ls *.war)
+            echo "$WAR_BASE_DIR/$dir/$war_file"
+            if [ -f $WAR_BASE_DIR/$dir/$war_file ];
+            then
+                echo "修改$WAR_BASE_DIR/$dir/$war_file"
+                for file in $(ls);
+                do
+                    if [[ -f $WAR_BASE_DIR/$dir/$file && $file != $war_file && ${file##*.} != "tmp" ]];
+                    then
+                        echo "$war_file $file"
+                        jar -uvf $war_file $file
+                    fi
+                done
+                
+                jsconfig="$WAR_BASE_DIR/$dir/js/config"
+                if [ -e $jsconfig ];
+                    then
+                    for file in $(ls $jsconfig);
+                    do
+                        if [ -f $WAR_BASE_DIR/$dir/js/config/$file ];
+                        then
+                        echo "$war_file $file"
+                            jar -uvf $war_file js/config/$file
+                        fi
+                    done
+                fi
+                
+                for file in $(ls $WAR_BASE_DIR/$dir/WEB-INF/classes/);
+                do
+                    if [ -f $WAR_BASE_DIR/$dir/WEB-INF/classes/$file ];
+                    then
+                     echo "$war_file $file"
+                        jar -uvf $war_file WEB-INF/classes/$file
+                    fi
+                done
+                echo "部署$WAR_BASE_DIR/$dir/$war_file"
+                if [ -e $WEB_APPS_DIR ];
+                then
+                    rm -rf $WEB_APPS_DIR/${war_file%.*}
+                    rm -f $WEB_APPS_DIR/$war_file
+                    \cp -f $WAR_BASE_DIR/$dir/$war_file $WEB_APPS_DIR
+                else
+                    echo "$WEB_APPS_DIR目录不存在,无法部署$WAR_BASE_DIR/$dir/$war_file"
+                fi
+                
+            else
+                echo "$WAR_BASE_DIR/$dir目录下没有发现任何WAR包!"
+            fi
+        fi
+    done
+else
+    echo "$WAR_BASE_DIR不存在, 没有发现任何部署组件!"
+fi
+cd $BASE_DIR
+source $BASE_DIR/start tomcat
+echo "########################################################################"
+echo "############################### 部署war包任务结束 ########################"
+echo "########################################################################"
+
+
+
+
+
+
+
+
+

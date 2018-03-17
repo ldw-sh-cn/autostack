@@ -1,0 +1,71 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+fi
+source $BASE_DIR/packages/os/$OS/$OS_VERSION/env
+echo "########################################################################"
+echo "###############################    安装GLIB  ###########################"
+echo "########################################################################"
+#   下载安装包 只下载不安装 rhel系统必须注册 才能下载
+#   yum install glibc --downloadonly --downloaddir=/tmp/software/glibc
+#   yum install glibc-devel --downloadonly --downloaddir=/tmp/software/glibc-devel
+#   yum install readline --downloadonly --downloaddir=/tmp/software
+#   yum install readline-devel --downloadonly --downloaddir=/tmp/software
+#   yum install zlib-devel --downloadonly --downloaddir=/tmp/software
+#   yum install expect --downloadonly --downloaddir=/tmp/software/expect
+#pg requirements:
+#   make 3.8 make --version
+#   GCC
+#   zlib --without-zlib  pg_dump and pg_restore
+#   tar
+if [ "$GLIBC" = true ];
+then
+    # PKG_GLIBC="$BASE_DIR/packages/os/$OS/$OS_VERSION/glibc/$GLIBC_RPM"
+    # PKG_GLIBC_COMMON="$BASE_DIR/packages/os/$OS/$OS_VERSION/glibc/$GLIBC_COMMON"
+    # PKG_TZDATA="$BASE_DIR/packages/os/$OS/$OS_VERSION/glibc/$TZDATA"
+    # PKG_GLIBC_DEVEL="$BASE_DIR/packages/os/$OS/$OS_VERSION/glibc/$GLIBC_DEVEL"
+    # PKG_KERNEL_HEADERS="$BASE_DIR/packages/os/$OS/$OS_VERSION/glibc/$KERNEL_HEADERS"
+    # PKG_GLIB_HEADERS="$BASE_DIR/packages/os/$OS/$OS_VERSION/glibc/$GLIB_HEADERS"
+    # GLIBC_SRC="$BASE_DIR/packages/os/$OS/$OS_VERSION/glibc/glibc-$GLIBC_VERSION.tar.gz"
+    # GLIBC_PORTS_SRC="$BASE_DIR/packages/os/$OS/$OS_VERSION/glibc/glibc-ports-$GLIBC_VERSION.tar.gz"
+
+    echo "#############安装GLIBC#############"
+    # rpm -Uvh $PKG_GLIBC $PKG_GLIBC_COMMON $PKG_TZDATA
+    if [ -e $GLIBC_SRC ];
+    then
+        echo "解压GLIB"
+        tar -zxvf $GLIBC_SRC -C /usr/local
+        tar -zxvf $GLIBC_PORTS_SRC -C /usr/local/glibc-$GLIBC_VERSION/ports
+        # cp -f $BASE_DIR/packages/os/$OS/$OS_VERSION/glibc/test-installation.pl /usr/local/$GLIBC_VERSION/scripts
+        echo "configure GLIB"
+        cd /usr/local/glibc-$GLIBC_VERSION
+        mkdir glibc-buid
+        mkdir -p /usr/lib64/glibc-$GLIBC_VERSION/etc
+        touch /usr/lib64/glibc-$GLIBC_VERSION/etc/ld.so.conf
+        cd glibc-buid
+        ../configure --prefix=/usr/lib64/glibc-$GLIBC_VERSION
+        echo "编译安装 GLIB"
+        make && make install
+        echo "删除源码 GLIB"
+        cd /usr/local
+        rm -rf /usr/local/glibc-$GLIBC_VERSION
+    else
+        echo "$GLIBC_SRC不存在，无法安装！"
+    fi
+    # rpm -ivh $PKG_KERNEL_HEADERS $PKG_GLIB_HEADERS $PKG_GLIBC_DEVEL
+    echo "########################################################################"
+    echo "##############################   GLIB安装完成   #########################"
+    echo "########################################################################"
+else
+    echo "SKIP Install GLIBC"
+fi
+
+
+
+
+
+
+
+
+

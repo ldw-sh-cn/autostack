@@ -1,0 +1,56 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+source ./install-gcc
+source ./install-readline
+fi
+echo "########################################################################"
+echo "##############################     安装REDIS    ########################"
+echo "########################################################################"
+
+if [ "$REDIS" = true ];
+then
+    REDIS_HOME="/usr/local/redis"
+    rm -rf $REDIS_HOME
+    if [ -e $REDIS_HOME ];
+    then
+        echo "安装包$REDIS_HOME已存在，删除后再安装！"
+    else
+        PKG_REDIS="$BASE_DIR/packages/redis/$REDIS_TAR_GZ"
+        echo "检测REDIS安装包"
+        if [ -e $PKG_REDIS ];
+        then
+            echo "开始安装REDIS: $PKG_REDIS"
+            tar -zxvf $PKG_REDIS -C /usr/local
+            mv /usr/local/$REDIS_VERSION $REDIS_HOME
+            cd /usr/local/redis
+            echo $PWD
+            make MALLOC=libc || exit 1
+            echo "REDIS安装成功"
+            echo "配置REDIS"
+            rm -f $REDIS_HOME/src/redis.conf
+            \cp -f $BASE_DIR/packages/redis/redis.conf $REDIS_HOME/src
+            echo "配置REDIS成功"
+            echo "########################################################################"
+            echo "##########################   REDIS安装配置完成    ########################"
+            echo "########################################################################"
+            echo "启动REDIS"
+            $REDIS_HOME/src/redis-server $REDIS_HOME/src/redis.conf &
+            echo "REDIS启动成功"
+        else
+            echo "安装包$PKG_REDIS不存在，安装失败"
+        fi
+    fi
+else
+    echo "SKIP Install Redis!"
+fi
+
+
+
+
+
+
+
+
+

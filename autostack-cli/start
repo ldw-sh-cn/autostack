@@ -1,0 +1,58 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+fi
+echo "启动$*"
+START_PG=false
+START_REDIS=false
+START_TOMCAT=false
+CP_REDIS="redis"
+CP_PG="pg"
+CP_TOMCAT="tomcat"
+CP_ALL="all"
+for i in "$@"; do
+    if [[ "$i" = "$CP_REDIS" || "$i" = "$CP_ALL" ]];
+    then
+        START_REDIS=true
+    fi
+
+    if [[ "$i" = "$CP_PG" || "$i" = "$CP_ALL" ]];
+    then
+        START_PG=true
+    fi
+
+    if [[ "$i" = "$CP_TOMCAT" || "$i" = "$CP_ALL" ]];
+    then
+        START_TOMCAT=true
+    fi
+done
+
+if [ "$START_REDIS" = true ];
+then
+    source $BASE_DIR/env
+    echo "##############################"
+    echo "#######   启动REDIS   #########"
+    echo "##############################"
+    $REDIS_HOME/src/redis-server $REDIS_HOME/src/redis.conf & 
+    echo "REDIS 启动成功!!!"
+fi
+
+if [ "$START_PG" = true ];
+then
+    echo "##############################"
+    echo "######   启动PG-Server   ######"
+    echo "##############################"
+    su - postgres -s /bin/bash $BASE_DIR/start-pg $BASE_DIR
+    echo "PG-Server启动成功!!!"
+fi
+
+if [ "$START_TOMCAT" = true ];
+then
+    echo "##############################"
+    echo "#######   启动TOMCAT   #######"
+    echo "##############################"
+    source $BASE_DIR/env
+    source /etc/profile
+    $CATALINA_HOME/bin/startup.sh
+fi

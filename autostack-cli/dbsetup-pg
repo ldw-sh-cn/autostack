@@ -1,0 +1,49 @@
+#!/bin/sh
+echo ">>>>>>>$1 dbsetup $2"
+source $1/env
+ACT_INIT="init"
+echo "########################################################################"
+echo "###############################   DB $2   #########################"
+echo "########################################################################"
+
+if [ $2 = $ACT_INIT ];
+then
+    echo "初始化postgres密码$PWD_POSTGRES"
+    $PG_HOME/bin/psql -U postgres -d postgres -c "ALTER USER postgres WITH PASSWORD '$DB_POSTGRES_PWD';"
+fi
+
+i=0
+while [ $i -lt ${#DB_LIST[@]} ]
+do
+    db_name=${DB_LIST[$i]}
+    user_name=${DB_USER_LIST[$i]}
+    user_pwd=${DB_PWD_LIST[$i]}
+    sql_file="$BASE_DIR/packages/sql/${DB_SQL_LIST[$i]}"
+    echo ">>>>>>>>>>>>>>>>>>>$db_name $user_name $user_pwd $sql_file"
+    let i++
+    if [[ -n $db_name && -n $user_name ]];
+    then
+        if [[ -n $2 && $2 = $ACT_INIT && -n $user_pwd ]];
+        then
+            $PG_HOME/bin/psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS $db_name;"
+            $PG_HOME/bin/psql -U postgres -d postgres -c "DROP ROLE IF EXISTS $user_name;"
+            echo "创建数据库用户$user_name设置密码$user_pwd"
+            $PG_HOME/bin/psql -U postgres -d postgres -c "create user $user_name with password '$user_pwd';"
+            echo "创建数据库$db_name"
+            $PG_HOME/bin/psql -U postgres -d postgres -c "create database $db_name TEMPLATE template1 ENCODING 'UTF-8';"
+            echo "授权$db_name给$user_name"
+            $PG_HOME/bin/psql -U postgres -d postgres -c "grant all privileges on database $db_name to $user_name;"
+        fi
+
+        echo "$user_name执行数据库$db_name升级脚本$sql_file"
+        if [[ -e $sql_file && -f $sql_file ]];
+        then
+            $PG_HOME/bin/psql -U $user_name -d $db_name -f $sql_file
+            echo "$user_name执行数据库$db_name升级脚本$sql_file完成"
+        fi
+    fi
+done
+
+echo "########################################################################"
+echo "##############################   DB $ACTION 完成  ######################"
+echo "########################################################################"

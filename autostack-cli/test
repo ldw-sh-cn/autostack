@@ -1,0 +1,29 @@
+#!/bin/sh
+# source ./env
+# # ./test-p
+# echo $BASE_DIR
+# su - test -s $BASE_DIR/test-p $BASE_DIR
+
+ADD_POSTGRES_GROUP=$(cat /etc/group | grep postgres)
+if [ -z $ADD_POSTGRES_GROUP ];
+then
+echo "postgres group 不存在"
+fi
+
+ADD_TEST_GROUP=$(cat /etc/group | grep test)
+if [ -n $ADD_TEST_GROUP ];
+then
+echo "test group存在"
+fi
+
+ADD_POSTGRES=$(cat /etc/passwd | grep postgres)
+if [ -z $ADD_POSTGRES ];
+then
+echo "postgres不存在"
+fi
+
+ADD_TEST=$(cat /etc/passwd | grep root)
+if [ -n $ADD_POSTGRES ];
+then
+echo "test存在"
+fi

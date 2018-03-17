@@ -1,0 +1,38 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+fi
+echo "########################################################################"
+echo "#############################    安装TOMCAT   ###########################"
+echo "########################################################################"
+if [ "$TOMCAT" = true ];
+then
+    PKG_TOMCAT="$BASE_DIR/packages/tomcat/$TOMCAT_TAR_GZ"
+    if [ -e $PKG_TOMCAT ];
+    then
+        echo "开始安装TOMCAT"
+        if [[ -n $CATALINA_HOME && -e $CATALINA_HOME ]];
+        then
+            echo "$CATALINA_HOME目录已存在，无法安装！"
+        else
+            tar -zxvf $PKG_TOMCAT -C /usr/local || exit 1
+            mv /usr/local/$CATALINA_VERSION $CATALINA_HOME
+            if [[ -n $CATALINA_BASH && -e $CATALINA_BASH ]];
+            then
+                SERVER_XML="$BASE_DIR/packages/tomcat/server.xml"
+                CATALINA_BASH="$BASE_DIR/packages/tomcat/catalina.sh"
+                \cp -f $SERVER_XML $CATALINA_HOME/conf/
+                \cp -f $CATALINA_BASH $CATALINA_HOME/bin/
+            fi
+            echo "########################################################################"
+            echo "#############################  TOMCAT安装成功  ##########################"
+            echo "########################################################################"
+            # source $BASE_DIR/start tomcat
+        fi
+    else
+        echo "TOMCAT安装包$PKG_TOMCAT不存在，无法安装！"
+    fi
+else
+    echo "SKIP Install TOMCAT!!!"
+fi

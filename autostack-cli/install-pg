@@ -1,0 +1,103 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+source ./install-gcc
+source ./install-readline
+fi
+echo "########################################################################"
+echo "###############################    安装PG   ############################"
+echo "########################################################################"
+if [ "$PG" = true ];
+then
+    PG_SRC_DIR="/usr/local/$PG_VERSION"
+    if [ -e $PG_SRC_DIR ];
+    then
+        echo "安装包$PG_SRC_DIR已存在，删除后再安装！"
+    else
+        PKG_PG="$BASE_DIR/packages/pg/$PG_TAR_GZ"
+        echo "检测PG安装包"
+        if [[ -n $PKG_PG && -e $PKG_PG ]];
+        then
+            echo "开始安装PG: $PKG_PG"
+            tar -zxvf $PKG_PG -C /usr/local
+            cd $PG_SRC_DIR
+            echo $PWD
+            TMP_DIR="/tmp"
+            if [ ! -e $TMP_DIR ];
+            then
+                mkdir $TMP_DIR
+            fi
+            echo "检查PG安装路径"
+            if [ -z $PG_HOME ];
+            then
+                PG_HOME="/usr/local/pgsql"
+            fi
+
+            echo "配置PG源码"
+            ./configure --prefix=$PG_HOME || exit 1
+            echo "编译PG源码并安装"
+            make && make install
+            
+            ADD_POSTGRES_GROUP=$(cat /etc/group | grep postgres)
+            if [ -z $ADD_POSTGRES_GROUP ];
+            then
+                echo "创建PG操作用户组postgres"
+                groupadd postgres || exit 1
+            fi
+            
+            ADD_POSTGRES=$(cat /etc/passwd | grep postgres)
+            if [ -z $ADD_POSTGRES ];
+            then
+                echo "创建PG操作用户postgres"
+                useradd -g postgres postgres || exit 1
+            fi
+
+            echo "配置PG启动脚本"
+            cp $PG_SRC_DIR/contrib/start-scripts/linux /etc/init.d/pgsqld
+            chmod 755 /etc/init.d/pgsqld
+
+            echo "配置PG数据目录"
+            if [[ -z $PG_DATA_DIR || ! -e $PG_DATA_DIR ]];
+            then
+                PG_DATA_DIR="$PG_HOME/data"
+                mkdir -p $PG_DATA_DIR
+            fi
+            echo "创建PG数据路径$PG_DATA_DIR"
+
+            if [[ -z $PG_LOG_DIR || ! -e $PG_LOG_DIR ]];
+            then
+                PG_LOG_DIR="$PG_HOME/log"
+                mkdir -p $PG_LOG_DIR
+            fi
+            echo "创建PG日志路径$PG_LOG_DIR"
+            touch $PG_LOG_DIR/pgsql.log || exit 1
+
+            echo "修改目录$TMP_DIR, $PG_HOME, $PG_DATA_DIR, $PG_LOG_DIR所有人 postgres:postgres"
+            chown -R postgres:postgres $TMP_DIR || exit 1
+            chown -R postgres:postgres $PG_HOME || exit 1
+            chown -R postgres:postgres $PG_DATA_DIR || exit 1
+            chown -R postgres:postgres $PG_LOG_DIR || exit 1
+            chown -R postgres:postgres $PG_LOG_DIR/pgsql.log || exit 1
+            chown -R postgres:postgres /etc/init.d/pgsqld || exit 1
+
+            echo "创建PG环境变量"
+            echo "export PGDATA=$PG_DATA_DIR" >> /etc/profile 
+            echo "export PATH=$PG_HOME/bin:$PATH " >> /etc/profile
+            source /etc/profile
+            echo "初始化PG数据目录$PG_DATA_DIR"
+            su - postgres -s /bin/bash $BASE_DIR/install-pgdata $BASE_DIR
+            echo "########################################################################"
+            echo "##############################    PG安装完成    #########################"
+            echo "########################################################################"
+            
+            echo "启动PG-server"
+            su - postgres -s /bin/bash $BASE_DIR/start-pg $BASE_DIR
+            echo "PG-server启动成功!!!"
+        else
+            echo "安装包$PKG_PG不存在，安装失败"
+        fi
+    fi
+else
+    echo "SKIP Install PG!"
+fi

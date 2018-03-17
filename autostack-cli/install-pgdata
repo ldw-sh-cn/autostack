@@ -1,0 +1,19 @@
+#!/bin/sh
+echo ">>>>>>$1 install-pgdata $2"
+source $1/env
+echo "########################################################################"
+echo "##############################   初始化PG数据库  #########################"
+echo "########################################################################"
+if [[ -z $PG_DATA_DIR || ! -e $PG_DATA_DIR ]];
+then
+    PG_DATA_DIR="$PG_HOME/data"
+    mkdir -p $PG_DATA_DIR
+fi
+echo "初始化数据目录$PG_DATA_DIR"
+$PG_HOME/bin/initdb -D $PG_DATA_DIR
+echo "修改PG配置"
+\cp -f $BASE_DIR/packages/pg/pg_hba.conf $PG_DATA_DIR
+\cp -f $BASE_DIR/packages/pg/postgresql.conf $PG_DATA_DIR
+echo "########################################################################"
+echo "##############################  PG初始化配置完成 #########################"
+echo "########################################################################"

@@ -1,0 +1,39 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+fi
+source $BASE_DIR/packages/os/$OS/$OS_VERSION/env
+echo "########################################################################"
+echo "##############################   安装READLINE  #########################"
+echo "########################################################################"
+PKG_READ_LINE="$BASE_DIR/packages/os/$OS/$OS_VERSION/readline/$READ_LINE"
+PKG_NCURSES_DEVEL="$BASE_DIR/packages/os/$OS/$OS_VERSION/readline/$NCURSES_DEVEL"
+PKG_READLINE_DEVEL="$BASE_DIR/packages/os/$OS/$OS_VERSION/readline/$READLINE_DEVEL"
+PKG_ZLIB_DEVEL="$BASE_DIR/packages/os/$OS/$OS_VERSION/readline/$ZLIB_DEVEL"
+
+if [ "$READLINE" = true ];
+then
+echo "升级$PKG_READ_LINE"
+rpm -ivh $PKG_READ_LINE
+
+echo "升级$PKG_READLINE_DEVEL $PKG_NCURSES_DEVEL"
+rpm -ivh $PKG_NCURSES_DEVEL $PKG_READLINE_DEVEL
+
+echo "升级$PKG_ZLIB_DEVEL"
+rpm -ivh $PKG_ZLIB_DEVEL
+echo "########################################################################"
+echo "##############################   READLINE安装完成  #######################"
+echo "########################################################################"
+else
+    echo "SKIP Install READLINE"
+fi
+
+
+
+
+
+
+
+
+

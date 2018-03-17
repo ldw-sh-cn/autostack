@@ -1,0 +1,8 @@
+#!/bin/sh
+BASE_DIR=$1
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>$BASE_DIR"
+if [ -z $BASE_DIR ];
+then
+source ./env
+fi
+echo ">>>>>>>>>>$CATALINA_HOME"

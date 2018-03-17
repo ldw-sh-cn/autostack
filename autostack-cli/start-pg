@@ -1,0 +1,13 @@
+#!/bin/sh
+echo ">>>>>$1 start-pg $2"
+source $1/env
+$PG_HOME/bin/pg_ctl -D $PG_DATA_DIR -l $PG_LOG_DIR/pgsql.log start
+
+
+
+
+
+
+
+
+

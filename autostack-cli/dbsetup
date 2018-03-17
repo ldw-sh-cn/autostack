@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+fi
+su - postgres -s $BASE_DIR/dbsetup-pg $BASE_DIR $1

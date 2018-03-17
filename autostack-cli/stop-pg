@@ -1,0 +1,14 @@
+#!/bin/sh
+echo ">>>>>>>$1 stop-pg $2"
+source $1/env
+echo "#######################  停止PG-Server #######################"
+$PG_HOME/bin/pg_ctl stop -D $PG_DATA_DIR
+echo "#######################  PG-Server已停止 #######################"
+
+
+
+
+
+
+
+

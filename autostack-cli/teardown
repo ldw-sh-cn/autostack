@@ -1,0 +1,21 @@
+#!/bin/sh
+if [ -z $BASE_DIR ];
+then
+source ./env
+fi
+echo "停止所有中间件>>>>>>>>"
+$BASE_DIR/stop all
+
+echo "删除环境变量>>>>>>>>>>"
+\cp -f $BASE_DIR/profile /etc/
+
+echo "删除所有中间件和JDK>>>"
+rm -rf ./install.log
+rm -rf /tmp/
+rm -rf /usr/local/java/
+rm -rf /usr/local/pgsql/
+rm -rf /usr/local/postgresql-9.5.9/
+rm -f /etc/init.d/pgsqld
+rm -rf /usr/local/tomcat7/
+rm -rf /usr/local/redis/
+
